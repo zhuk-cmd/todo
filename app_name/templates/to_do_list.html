@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>My to-do list</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a style="color: #FFFFFF" class="navbar-text">My to-do list</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto"></ul>
+        <form class="form-inline my-2 my-lg-0" action="/addtodo/" method="post">{% csrf_token %}
+            <input class="form-control mr-sm-2" type="text" name="content" placeholder="Впишите сюда задачу"/>
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Добавить</button>
+        </form>
+        <form class="form-inline my-2 my-lg-0" action="/deleteall/" method="post">{% csrf_token %}
+            <button class="btn btn-outline-danger my-2 my-sm-0" style="margin:5px;" type="submit">Удалить все</button>
+        </form>
+        <form class="form-inline my-2 my-lg-0" action="/deletecompleted/" method="post">{% csrf_token %}
+            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Удалить выполненные</button>
+        </form>
+    </div>
+</nav>
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissable" role="alert">
+            <button class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="container-fluid my-3">
+    <ul class="list-group-flush">
+        {% for to_do_item in all_items %}
+
+            {% if to_do_item.important and not to_do_item.completed%}
+                <li class="list-group-item"><b style="color: red">{{ to_do_item.content }} | {{ to_do_item.created|date:"l d/m/y, G:i:s" }}</b>
+                    <div class="float-right">
+                        <form action="/redirectedit/{{to_do_item.id}}/{{to_do_item.content}}"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Редактировать</button>
+                        </form>
+
+                        <form action="/markascompleted/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Отметить как выполненно</button>
+                        </form>
+
+                        <form action="/makeimportant/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-success btn-sm" type="submit">Обычный приоритет</button>
+                        </form>
+
+                        <form action="/deletetodo/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if not to_do_item.important and to_do_item.completed%}
+                <li class="list-group-item"><strike>{{ to_do_item.content }} | {{ to_do_item.created|date:"l d/m/y, G:i:s" }}</strike>
+                    <div class="float-right">
+                        <form action="/redirectedit/{{to_do_item.id}}/{{to_do_item.content}}"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Редактировать</button>
+                        </form>
+
+                        <form action="/markascompleted/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Отметить как не выполненно</button>
+                        </form>
+
+                        <form action="/deletetodo/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if not to_do_item.important and not to_do_item.completed%}
+                <li class="list-group-item">{{ to_do_item.content }} | {{ to_do_item.created|date:"l d/m/y, G:i:s" }}
+                    <div class="float-right">
+                        <form action="/redirectedit/{{to_do_item.id}}/{{to_do_item.content}}"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Редактировать</button>
+                        </form>
+
+                        <form action="/markascompleted/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-dark btn-sm" type="submit">Отметить как выполненно</button>
+                        </form>
+
+                        <form action="/makeimportant/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-success btn-sm" type="submit">Высокий приоритет</button>
+                        </form>
+
+                        <form action="/deletetodo/{{to_do_item.id}}/"
+                              style="display: inline;"
+                              method="post">{% csrf_token %}
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </li>
+            {% endif %}
+
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
